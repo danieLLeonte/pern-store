@@ -15,6 +15,7 @@ app.use(
     origin: "http://localhost:3000",
   })
 );
+app.use("/uploads", express.static("uploads"));
 
 app.get("/", (request, response) => {
   response.json({ info: "Node.js, Express, and Postgres API" });

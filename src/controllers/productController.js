@@ -5,7 +5,15 @@ const db = require("../db/index");
 // GET: /products | getProducts()
 const getProducts = asyncHandler(async (req, res) => {
   const result = await db.query("SELECT * FROM products ORDER BY id ASC");
-  res.status(200).json(result.rows);
+
+  const productsWithImageUrls = result.rows.map((product) => ({
+    ...product,
+    imageurl: product.imageurl
+      ? `http://localhost:3001/${product.imageurl}`
+      : null,
+  }));
+
+  res.status(200).json(productsWithImageUrls);
 });
 
 // GET: /products/:id | getProductById()
@@ -18,13 +26,14 @@ const getProductById = asyncHandler(async (req, res) => {
 // POST: /products | createProduct()
 const createProduct = asyncHandler(async (req, res) => {
   const { name, description, price, quantity } = req.body;
+  const imagePath = req.file ? req.file.path : null;
 
   const result = await db.query(
-    "INSERT INTO products (name, description, price, quantity) VALUES ($1, $2, $3, $4) RETURNING *",
-    [name, description, price, quantity]
+    "INSERT INTO products (name, description, price, quantity, imageurl) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+    [name, description, price, quantity, imagePath]
   );
 
-  res.status(201).send(`Product added with ID: ${result.rows[0].productid}`);
+  res.status(201).send(`Product added with ID: ${result.rows[0].id}`);
 });
 
 // PUT /products/:id | updateProduct()
