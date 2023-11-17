@@ -6,11 +6,10 @@ const db = require("../db/index");
 const getProducts = asyncHandler(async (req, res) => {
   const result = await db.query("SELECT * FROM products ORDER BY id ASC");
 
+  const serverUrl = process.env.SERVER_URL;
   const productsWithImageUrls = result.rows.map((product) => ({
     ...product,
-    imageurl: product.imageurl
-      ? `http://localhost:3001/${product.imageurl}`
-      : null,
+    imageurl: product.imageurl ? `${serverUrl}/${product.imageurl}` : null,
   }));
 
   res.status(200).json(productsWithImageUrls);

@@ -15,26 +15,14 @@ const getUserById = asyncHandler(async (req, res) => {
   res.status(200).json(result.rows);
 });
 
-// POST: /users | createUser()
-const createUser = asyncHandler(async (req, res) => {
-  const { name, email } = req.body;
-
-  const result = await db.query(
-    "INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *",
-    [name, email]
-  );
-
-  res.status(201).send(`User added with ID: ${result.rows[0].id}`);
-});
-
 // PUT: /users/:id | updateUser()
 const updateUser = asyncHandler(async (req, res) => {
   const id = parseInt(req.params.id);
-  const { name, email } = req.body;
+  const { username, password } = req.body;
 
   const result = await db.query(
-    "UPDATE users SET name = $1, email = $2 WHERE id = $3",
-    [name, email, id]
+    "UPDATE users SET username = $1, password = $2 WHERE id = $3",
+    [username, password, id]
   );
   res.status(200).send(`User modified with ID: ${id}`);
 });
@@ -50,7 +38,6 @@ const deleteUser = asyncHandler(async (req, res) => {
 module.exports = {
   getUsers,
   getUserById,
-  createUser,
   updateUser,
   deleteUser,
 };
