@@ -44,7 +44,9 @@ const signin = expressAsyncHandler(async (req, res) => {
       result.rows[0].password
     );
     if (validPassword) {
-      res.send("Sign-in successful");
+      const token = generateToken(result.rows[0]);
+      res.json({ token });
+      // res.send("Sign-in successful");
     } else {
       res.send("Invalid password");
     }
