@@ -25,8 +25,8 @@ const signup = expressAsyncHandler(async (req, res) => {
   );
 
   const token = generateToken(result.rows[0]);
-  res.json({ token });
-  // res.status(201).send(`User created with ID: ${result.rows[0].id}`);
+  res.cookie("jwt", token, config);
+  res.status(201).send(`User created with ID: ${result.rows[0].id}`);
 });
 
 // POST: /auth/signin | signin()
@@ -45,8 +45,8 @@ const signin = expressAsyncHandler(async (req, res) => {
     );
     if (validPassword) {
       const token = generateToken(result.rows[0]);
-      res.json({ token });
-      // res.send("Sign-in successful");
+      res.cookie("jwt", token, config);
+      res.send("Sign-in successful");
     } else {
       res.send("Invalid password");
     }
@@ -69,6 +69,12 @@ const generateToken = (user) => {
   };
 
   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "7d" });
+};
+
+const config = {
+  secure: process.env.NODE_ENV === "development" ? false : true,
+  httpOnly: process.env.NODE_ENV === "development" ? false : true,
+  sameSite: process.env.NODE_ENV === "development" ? false : "none",
 };
 
 module.exports = {

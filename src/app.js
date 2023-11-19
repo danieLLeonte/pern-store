@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
 const authRoutes = require("./routes/authRoutes");
@@ -15,8 +16,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
     origin: process.env.CLIENT_URL,
+    credentials: true,
   })
 );
+app.use(cookieParser());
 app.use("/uploads", express.static("uploads"));
 
 app.get("/", (request, response) => {
