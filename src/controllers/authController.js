@@ -11,6 +11,24 @@ const protectedRoute = (req, res) => {
   });
 };
 
+// GET: /auth/check | authCheck()
+const authCheck = (req, res) => {
+  res.json({
+    ...req.user,
+  });
+};
+
+// GET: /auth/logout | logout()
+const logout = (req, res) => {
+  res.cookie("jwt", "none", {
+    ...config,
+    expires: new Date(Date.now() + 5 * 1000),
+  });
+  res
+    .status(200)
+    .json({ success: true, message: "User logged out successfully" });
+};
+
 // POST: /auth/signup | signup()
 const signup = expressAsyncHandler(async (req, res) => {
   const { username, password } = req.body;
@@ -20,13 +38,16 @@ const signup = expressAsyncHandler(async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const result = await db.query(
-    "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id",
+    "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *",
     [username, hashedPassword]
   );
 
   const token = generateToken(result.rows[0]);
   res.cookie("jwt", token, config);
-  res.status(201).send(`User created with ID: ${result.rows[0].id}`);
+  res.send({
+    id: result.rows[0].id,
+    username: result.rows[0].username,
+  });
 });
 
 // POST: /auth/signin | signin()
@@ -46,7 +67,10 @@ const signin = expressAsyncHandler(async (req, res) => {
     if (validPassword) {
       const token = generateToken(result.rows[0]);
       res.cookie("jwt", token, config);
-      res.send("Sign-in successful");
+      res.send({
+        id: result.rows[0].id,
+        username: result.rows[0].username,
+      });
     } else {
       res.send("Invalid password");
     }
@@ -64,7 +88,7 @@ const validateInputs = (username, password) => {
 
 const generateToken = (user) => {
   const payload = {
-    userId: user.id,
+    id: user.id,
     username: user.username,
   };
 
@@ -81,4 +105,6 @@ module.exports = {
   signup,
   signin,
   protectedRoute,
+  authCheck,
+  logout,
 };
