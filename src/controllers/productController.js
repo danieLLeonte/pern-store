@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 
 const db = require("../db/index");
+const Product = require("../models/product");
 
 // GET: /products | getProducts()
 const getProducts = asyncHandler(async (req, res) => {
@@ -27,9 +28,13 @@ const createProduct = asyncHandler(async (req, res) => {
   const { name, description, price, quantity } = req.body;
   const imagePath = req.file ? req.file.path : null;
 
-  const result = await db.query(
-    "INSERT INTO products (name, description, price, quantity, imageurl) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-    [name, description, price, quantity, imagePath]
+  const result = await Product.create(
+    name,
+    description,
+    price,
+    quantity,
+    imagePath,
+    req.user.id
   );
 
   res.status(201).send(`Product added with ID: ${result.rows[0].id}`);

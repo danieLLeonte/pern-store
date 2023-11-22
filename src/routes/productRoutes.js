@@ -10,7 +10,7 @@ const {
 const { upload } = require("../middleware/uploadMiddleware");
 const auth = require("../middleware/authMiddleware");
 const validate = require("../middleware/validationMiddleware");
-const { product } = require("../schemas/validation");
+const { product } = require("../validation/productValidation");
 
 const router = express.Router();
 
