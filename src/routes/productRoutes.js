@@ -7,15 +7,17 @@ const {
   updateProduct,
   deleteProduct,
 } = require("../controllers/productController");
-const auth = require("../middleware/authMiddleware");
 const { upload } = require("../middleware/uploadMiddleware");
+const auth = require("../middleware/authMiddleware");
+const validate = require("../middleware/validationMiddleware");
+const { product } = require("../schemas/validation");
 
 const router = express.Router();
 
 router
   .route("/")
   .get(getProducts)
-  .post(auth, upload.single("image"), createProduct);
+  .post(auth, upload.single("image"), validate(product), createProduct);
 router
   .route("/:id")
   .get(getProductById)
